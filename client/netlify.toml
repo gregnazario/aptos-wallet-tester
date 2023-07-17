@@ -1,0 +1,12 @@
+# Let's not use the "netlify" domain
+[[redirects]]
+  from = "https://gnazario-wallet-tester.netlify.app"
+  to = "https://wallet-tester.gnazar.io"
+  status = 301
+  force = true
+
+# Ensure that SPA works correctly
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
