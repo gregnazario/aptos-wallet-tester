@@ -3,57 +3,53 @@ import {WalletSelector} from "@aptos-labs/wallet-adapter-ant-design";
 import "@aptos-labs/wallet-adapter-ant-design/dist/index.css";
 import {Network, Provider, Types} from "aptos";
 import {useWallet} from "@aptos-labs/wallet-adapter-react";
+import {useState} from "react";
 
 // TODO: Load URL from wallet
 export const CLIENT = new Provider(Network.DEVNET);
 
 // TODO: make this more accessible / be deployed by others?
 export const MODULE_ADDRESS = "0xb11affd5c514bb969e988710ef57813d9556cc1e3fe6dc9aa6a82b56aee53d98";
+export const OBJECT_ADDRESS = "0x67e586973b2ccda1491aa274fc40c89cef5ae4e44aeb4746977b932867788ada";
 
 
 function App(this: any) {
-    const {network, connected, signAndSubmitTransaction} = useWallet();
+    const {network, connected, signAndSubmitTransaction, account, wallet, isLoading} = useWallet();
 
     const isDevnet = (): boolean => {
-        return (network?.name as string).toLowerCase() === 'devnet';
+        // There's a very specific override here for Martian
+        return (network?.name as string).toLowerCase() === 'devnet' || (wallet?.name === "Martian" && network?.name.toLowerCase() === "custom");
     }
 
-    const testObject = async () => {
+    const testObject = async (setState: TxnCallback) => {
         await runTransaction(
+            setState,
             {
                 type: "entry_function_payload",
                 function: `${MODULE_ADDRESS}::wallet_tester::test_object`,
                 type_arguments: ["0x1::object::ObjectCore"],
                 arguments: [
-                    "0x12345",
+                    OBJECT_ADDRESS,
                 ],
             })
     }
 
-    const testVectorObject = async () => {
+    const testVectorObject = async (setState: TxnCallback) => {
         await runTransaction(
+            setState,
             {
                 type: "entry_function_payload",
                 function: `${MODULE_ADDRESS}::wallet_tester::test_vector_object`,
                 type_arguments: ["0x1::object::ObjectCore"],
                 arguments: [
-                    ["0x12345", "0x54321"],
-                ],
-            })
-
-        await runTransaction(
-            {
-                type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_vector_object`,
-                type_arguments: ["0x1::object::ObjectCore"],
-                arguments: [
-                    [],
+                    [OBJECT_ADDRESS, OBJECT_ADDRESS],
                 ],
             })
     }
 
-    const testOptionSome = async () => {
+    const testOptionSome = async (setState: TxnCallback) => {
         await runTransaction(
+            setState,
             {
                 type: "entry_function_payload",
                 function: `${MODULE_ADDRESS}::wallet_tester::test_vector_option`,
@@ -65,8 +61,9 @@ function App(this: any) {
 
     }
 
-    const testOptionNone = async () => {
+    const testOptionNone = async (setState: TxnCallback) => {
         await runTransaction(
+            setState,
             {
                 type: "entry_function_payload",
                 function: `${MODULE_ADDRESS}::wallet_tester::test_vector_option`,
@@ -77,8 +74,9 @@ function App(this: any) {
             })
     }
 
-    const testOptionVectorSome = async () => {
+    const testOptionVectorSome = async (setState: TxnCallback) => {
         await runTransaction(
+            setState,
             {
                 type: "entry_function_payload",
                 function: `${MODULE_ADDRESS}::wallet_tester::test_option_vector`,
@@ -88,8 +86,9 @@ function App(this: any) {
                 ],
             })
     }
-    const testOptionVectorNone = async () => {
+    const testOptionVectorNone = async (setState: TxnCallback) => {
         await runTransaction(
+            setState,
             {
                 type: "entry_function_payload",
                 function: `${MODULE_ADDRESS}::wallet_tester::test_vector_option`,
@@ -100,8 +99,9 @@ function App(this: any) {
             })
     }
 
-    const testError = async () => {
+    const testError = async (setState: TxnCallback) => {
         await runTransaction(
+            setState,
             {
                 type: "entry_function_payload",
                 function: `${MODULE_ADDRESS}::wallet_tester::test_error`,
@@ -110,8 +110,9 @@ function App(this: any) {
             })
     }
 
-    const testU8 = async () => {
+    const testU8 = async (setState: TxnCallback) => {
         await runTransaction(
+            setState,
             {
                 type: "entry_function_payload",
                 function: `${MODULE_ADDRESS}::wallet_tester::test_u8`,
@@ -122,8 +123,9 @@ function App(this: any) {
             })
     }
 
-    const testU16 = async () => {
+    const testU16 = async (setState: TxnCallback) => {
         await runTransaction(
+            setState,
             {
                 type: "entry_function_payload",
                 function: `${MODULE_ADDRESS}::wallet_tester::test_u16`,
@@ -134,8 +136,9 @@ function App(this: any) {
             })
     }
 
-    const testU32 = async () => {
+    const testU32 = async (setState: TxnCallback) => {
         await runTransaction(
+            setState,
             {
                 type: "entry_function_payload",
                 function: `${MODULE_ADDRESS}::wallet_tester::test_u32`,
@@ -147,8 +150,9 @@ function App(this: any) {
             })
     }
 
-    const testU64 = async () => {
+    const testU64 = async (setState: TxnCallback) => {
         await runTransaction(
+            setState,
             {
                 type: "entry_function_payload",
                 function: `${MODULE_ADDRESS}::wallet_tester::test_u64`,
@@ -159,8 +163,9 @@ function App(this: any) {
             })
     }
 
-    const testU128 = async () => {
+    const testU128 = async (setState: TxnCallback) => {
         await runTransaction(
+            setState,
             {
                 type: "entry_function_payload",
                 function: `${MODULE_ADDRESS}::wallet_tester::test_u128`,
@@ -171,8 +176,9 @@ function App(this: any) {
             })
     }
 
-    const testU256 = async () => {
+    const testU256 = async (setState: TxnCallback) => {
         await runTransaction(
+            setState,
             {
                 type: "entry_function_payload",
                 function: `${MODULE_ADDRESS}::wallet_tester::test_u256`,
@@ -183,42 +189,20 @@ function App(this: any) {
             })
     }
 
-    const testF32 = async () => {
-        await runTransaction(
-            {
-                type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_f32`,
-                type_arguments: [],
-                arguments: [
-                    0
-                ],
-            })
-    }
-
-    const testF64 = async () => {
-        await runTransaction(
-            {
-                type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_f64`,
-                type_arguments: [],
-                arguments: [
-                    0
-                ],
-            })
-    }
-
-    const runTransaction = async <T extends Types.TransactionPayload>(payload: T) => {
-        console.log(`Running payload: ${payload}`);
+    const runTransaction = async <T extends Types.TransactionPayload>(setState: TxnCallback, payload: T) => {
+        console.log(`Running payload: ${JSON.stringify(payload)}`);
         try {
             const response = await signAndSubmitTransaction(payload);
             console.log(`Successfully submitted`);
             await CLIENT.waitForTransaction(response.hash);
             console.log(`Successfully committed`);
             let txn = await CLIENT.getTransactionByHash(response.hash) as any;
-            console.log(`Txn: ${txn}`);
+            console.log(`Txn: ${JSON.stringify(txn)}`);
+            setState({state: "success", msg: `Successful txn ${txn.hash}`})
             return txn;
         } catch (error: any) {
             console.log("Failed to wait for txn" + error)
+            setState({state: "error", msg: `Failed txn due to ${JSON.stringify(error)}`})
         }
 
         return undefined;
@@ -235,6 +219,40 @@ function App(this: any) {
                         <WalletSelector/>
                     </Col>
                 </Row>
+                <Row>
+                    <Col offset={2}>
+                        <ul>
+                            <li>
+                                <img width={50} src={wallet?.icon} alt={`${wallet?.name}'s Icon`}/>
+                                {wallet?.name}
+                            </li>
+                            <li>
+                                Network name: "{network?.name}"
+                            </li>
+                            <li>
+                                Network URL: "{network?.url}"
+                            </li>
+                            <li>
+                                Network Chain ID: "{network?.chainId}"
+                            </li>
+                            <li>
+                                Address: "{account?.address}"
+                            </li>
+                            <li>
+                                ANS Name: "{account?.ansName}"
+                            </li>
+                            <li>
+                                Public Key: "{account?.publicKey}"
+                            </li>
+                            <li>
+                                Keys required: "{account?.minKeysRequired}"
+                            </li>
+                            <li>
+                                Is loading: {JSON.stringify(isLoading)}
+                            </li>
+                        </ul>
+                    </Col>
+                </Row>
             </Layout>
             {
                 !connected &&
@@ -247,60 +265,61 @@ function App(this: any) {
             {connected && isDevnet() &&
                 <Layout>
                     <EasyTitle msg="Numbers"/>
-                    <Row align="middle">
-                        <Col offset={2}></Col>
-                        <EasyButton msg="Test u8" func={() => testU8()}/>
-                        <EasyButton msg="Test u16" func={() => testU16()}/>
-                        <EasyButton msg="Test u32" func={() => testU32()}/>
-                        <EasyButton msg="Test u64" func={() => testU64()}/>
-                        <EasyButton msg="Test u128" func={() => testU128()}/>
-                        <EasyButton msg="Test u256" func={() => testU256()}/>
-                    </Row>
+                    <EasyButton msg="Test u8" func={testU8}/>
+                    <EasyButton msg="Test u16" func={testU16}/>
+                    <EasyButton msg="Test u32" func={testU32}/>
+                    <EasyButton msg="Test u64" func={testU64}/>
+                    <EasyButton msg="Test u128" func={testU128}/>
+                    <EasyButton msg="Test u256" func={testU256}/>
 
-                    <EasyTitle msg="Fixed Point"/>
-                    <Row align="middle">
-                        <Col offset={2}></Col>
-                        <EasyButton msg="Test f32" func={() => testF32()}/>
-                        <EasyButton msg="Test f64" func={() => testF64()}/>
-                    </Row>
                     <EasyTitle msg="Objects"/>
-                    <Row align="middle">
-                        <Col offset={2}></Col>
-                        <EasyButton msg="Test object (Object<T>)" func={() => testObject()}/>
-                        <EasyButton msg="Test vector object (vector<Object<T>>)" func={() => testVectorObject()}/>
-                    </Row>
+                    <EasyButton msg="Test object (Object<T>)" func={testObject}/>
+                    <EasyButton msg="Test vector object (vector<Object<T>>)" func={testVectorObject}/>
                     <EasyTitle msg="Options"/>
-                    <Row align="middle">
-                        <Col offset={2}></Col>
-                        <EasyButton msg="Test option Some (Option<u64>(some))" func={() => testOptionSome()}/>
-                        <EasyButton msg="Test option None (Option<u64>(none))" func={() => testOptionNone()}/>
-                        <EasyButton msg="Test vector option Some (Vector<Option<u64>>(some))"
-                                    func={() => testOptionVectorSome()}/>
-                        <EasyButton msg="Test vector option None (Vector<Option<u64>>(none))"
-                                    func={() => testOptionVectorNone()}/>
-                    </Row>
+                    <EasyButton msg="Test option Some (Option<u64>(some))" func={testOptionSome}/>
+                    <EasyButton msg="Test option None (Option<u64>(none))" func={testOptionNone}/>
+                    <EasyButton msg="Test vector option Some (Vector<Option<u64>>(some))"
+                                func={testOptionVectorSome}/>
+                    <EasyButton msg="Test vector option None (Vector<Option<u64>>(none))"
+                                func={testOptionVectorNone}/>
                     <EasyTitle msg="Errors"/>
-                    <Row align="middle">
-                        <Col offset={2}></Col>
-                        <EasyButton msg="Test error" func={() => testError()}/>
-                    </Row>
+                    <EasyButton msg="Test error" func={testError}/>
                 </Layout>
             }
         </>
     );
 }
 
-function EasyButton(props: { msg: string, func: () => Promise<void> }) {
-    return <Col>
-        <Button
-            onClick={props.func}
-            type="primary"
-            style={{height: "40px", backgroundColor: "#3f67ff"}}
-        >
-            {props.msg}
-        </Button>
-    </Col>
-        ;
+type ButtonState = { msg: string, state: ReturnState };
+type ReturnState = "success" | "error" | undefined;
+type TxnCallback = (state: ButtonState) => void;
+
+const toState = (state: ReturnState): "success" | "error" | "info" => {
+    if (state !== undefined) {
+        return state
+    } else {
+        return "info"
+    }
+}
+
+function EasyButton(props: { msg: string, func: (setState: TxnCallback) => Promise<void> }) {
+    const [state, setState] = useState<ButtonState>({msg: "", state: undefined});
+    return <Row align="middle">
+        <Col offset={2}>
+            <Button
+                onClick={() => props.func(setState)}
+                type="primary"
+                style={{height: "40px", backgroundColor: "#3f67ff"}}
+            >
+                {props.msg}
+            </Button>
+        </Col>
+        <Col offset={2}>
+            {state.state &&
+                <Alert type={toState(state.state)} message={state.msg}/>
+            }
+        </Col>
+    </Row>;
 }
 
 function EasyTitle(props: { msg: string }) {
