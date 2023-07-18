@@ -1,16 +1,20 @@
 import {Alert, Button, Col, Layout, Row} from "antd";
 import {WalletSelector} from "@aptos-labs/wallet-adapter-ant-design";
 import "@aptos-labs/wallet-adapter-ant-design/dist/index.css";
-import {Network, Provider, Types} from "aptos";
+import {FaucetClient, Network, Provider, Types} from "aptos";
 import {useWallet} from "@aptos-labs/wallet-adapter-react";
 import {useState} from "react";
 
 // TODO: Load URL from wallet
-export const CLIENT = new Provider(Network.DEVNET);
+export const DEVNET_CLIENT = new Provider(Network.DEVNET);
+export const TESTNET_CLIENT = new Provider(Network.TESTNET);
 
+export const DEVNET_FAUCET = new FaucetClient("https://fullnode.devnet.aptoslabs.com", "https://faucet.devnet.aptoslabs.com");
+export const TESTNET_FAUCET = new FaucetClient("https://fullnode.testnet.aptoslabs.com", "https://faucet.testnet.aptoslabs.com");
 // TODO: make this more accessible / be deployed by others?
-export const MODULE_ADDRESS = "0xb11affd5c514bb969e988710ef57813d9556cc1e3fe6dc9aa6a82b56aee53d98";
-export const OBJECT_ADDRESS = "0x67e586973b2ccda1491aa274fc40c89cef5ae4e44aeb4746977b932867788ada";
+export const MODULE_ADDRESS = "0x2b8ce856ae7536f41cddd1f7be1d9b69a46aa79a65e5b35f7f55732989751498";
+export const DEVNET_OBJECT_ADDRESS = "0x67e586973b2ccda1491aa274fc40c89cef5ae4e44aeb4746977b932867788ada";
+export const TESTNET_OBJECT_ADDRESS = "0x0777b949da6b895f058745a393ef9e90fc62137c625d03cb8c19fcac5fd372ff";
 
 
 function App(this: any) {
@@ -21,7 +25,44 @@ function App(this: any) {
         return (network?.name as string).toLowerCase() === 'devnet' || (wallet?.name === "Martian" && network?.name.toLowerCase() === "custom");
     }
 
+    const isTestnet = (): boolean => {
+        // There's a very specific override here for Martian
+        return (network?.name as string).toLowerCase() === 'testnet';
+    }
+
+    const objectAddress = (): string => {
+        if (isDevnet()) {
+            return DEVNET_OBJECT_ADDRESS
+        } else if (isTestnet()) {
+            return TESTNET_OBJECT_ADDRESS
+        } else {
+            console.log("Only devnet and testnet are supported")
+            return "Invalid"
+        }
+    }
+
+    const fundAccount = async (setState: TxnCallback) => {
+        if (!account) {
+            setState({state: "error", msg: `Wallet not connected`})
+            return
+        }
+        try {
+            if (isDevnet()) {
+                await DEVNET_FAUCET.fundAccount(account?.address, 100000000)
+                setState({state: "success", msg: `Wallet funded`})
+            } else if (isTestnet()) {
+                await TESTNET_FAUCET.fundAccount(account?.address, 100000000)
+                setState({state: "success", msg: `Wallet funded`})
+            } else {
+                console.log("Only devnet and testnet are supported")
+                setState({state: "error", msg: `Wallet not connected`})
+            }
+        } catch (e: any) {
+            setState({state: "error", msg: `Failed to fund account ${JSON.stringify(e)}`})
+        }
+    }
     const testObject = async (setState: TxnCallback) => {
+        const object_address = objectAddress();
         await runTransaction(
             setState,
             {
@@ -29,12 +70,13 @@ function App(this: any) {
                 function: `${MODULE_ADDRESS}::wallet_tester::test_object`,
                 type_arguments: ["0x1::object::ObjectCore"],
                 arguments: [
-                    OBJECT_ADDRESS,
+                    object_address,
                 ],
             })
     }
 
     const testVectorObject = async (setState: TxnCallback) => {
+        const object_address = objectAddress();
         await runTransaction(
             setState,
             {
@@ -42,7 +84,7 @@ function App(this: any) {
                 function: `${MODULE_ADDRESS}::wallet_tester::test_vector_object`,
                 type_arguments: ["0x1::object::ObjectCore"],
                 arguments: [
-                    [OBJECT_ADDRESS, OBJECT_ADDRESS],
+                    [object_address, object_address],
                 ],
             })
     }
@@ -52,10 +94,11 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_vector_option`,
+                function: `${MODULE_ADDRESS}::wallet_tester::test_option`,
                 type_arguments: [],
                 arguments: [
                     "12345",
+                    false,
                 ],
             })
 
@@ -66,27 +109,45 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_vector_option`,
+                function: `${MODULE_ADDRESS}::wallet_tester::test_option`,
                 type_arguments: [],
                 arguments: [
                     undefined,
+                    true
                 ],
             })
     }
 
-    const testOptionVectorSome = async (setState: TxnCallback) => {
+    const testOptionStringSome = async (setState: TxnCallback) => {
         await runTransaction(
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_option_vector`,
+                function: `${MODULE_ADDRESS}::wallet_tester::test_option_string`,
                 type_arguments: [],
                 arguments: [
-                    ["12345", "54"],
+                    "",
+                    false
+                ],
+            })
+
+    }
+
+    const testOptionStringNone = async (setState: TxnCallback) => {
+        await runTransaction(
+            setState,
+            {
+                type: "entry_function_payload",
+                function: `${MODULE_ADDRESS}::wallet_tester::test_option_none`,
+                type_arguments: [],
+                arguments: [
+                    undefined,
+                    true
                 ],
             })
     }
-    const testOptionVectorNone = async (setState: TxnCallback) => {
+
+    const testVectorObjectSome = async (setState: TxnCallback) => {
         await runTransaction(
             setState,
             {
@@ -94,7 +155,21 @@ function App(this: any) {
                 function: `${MODULE_ADDRESS}::wallet_tester::test_vector_option`,
                 type_arguments: [],
                 arguments: [
-                    undefined, "12345"
+                    ["12345", "54"],
+                    false
+                ],
+            })
+    }
+    const testVectorObjectNone = async (setState: TxnCallback) => {
+        await runTransaction(
+            setState,
+            {
+                type: "entry_function_payload",
+                function: `${MODULE_ADDRESS}::wallet_tester::test_vector_option`,
+                type_arguments: [],
+                arguments: [
+                    undefined,
+                    true
                 ],
             })
     }
@@ -110,6 +185,40 @@ function App(this: any) {
             })
     }
 
+    const testBool = async (setState: TxnCallback) => {
+        await runTransaction(
+            setState,
+            {
+                type: "entry_function_payload",
+                function: `${MODULE_ADDRESS}::wallet_tester::test_bool`,
+                type_arguments: [],
+                arguments: [
+                    true
+                ],
+            })
+    }
+
+    const testAddress = async (setState: TxnCallback) => {
+        await runTransaction(
+            setState,
+            {
+                type: "entry_function_payload",
+                function: `${MODULE_ADDRESS}::wallet_tester::test_address`,
+                type_arguments: [],
+                arguments: ["0x1"]
+            })
+    }
+
+    const testString = async (setState: TxnCallback) => {
+        await runTransaction(
+            setState,
+            {
+                type: "entry_function_payload",
+                function: `${MODULE_ADDRESS}::wallet_tester::test_string`,
+                type_arguments: [],
+                arguments: ["hello world!"]
+            })
+    }
     const testU8 = async (setState: TxnCallback) => {
         await runTransaction(
             setState,
@@ -191,12 +300,22 @@ function App(this: any) {
 
     const runTransaction = async <T extends Types.TransactionPayload>(setState: TxnCallback, payload: T) => {
         console.log(`Running payload: ${JSON.stringify(payload)}`);
+        let client: Provider;
+        if (isDevnet()) {
+            client = DEVNET_CLIENT;
+        } else if (isTestnet()) {
+            client = TESTNET_CLIENT;
+        } else {
+            console.log("Only devnet and testnet are supported")
+            return undefined;
+        }
+
         try {
             const response = await signAndSubmitTransaction(payload);
             console.log(`Successfully submitted`);
-            await CLIENT.waitForTransaction(response.hash);
+            await client.waitForTransaction(response.hash);
             console.log(`Successfully committed`);
-            let txn = await CLIENT.getTransactionByHash(response.hash) as any;
+            let txn = await client.getTransactionByHash(response.hash) as any;
             console.log(`Txn: ${JSON.stringify(txn)}`);
             setState({state: "success", msg: `Successful txn ${txn.hash}`})
             return txn;
@@ -256,14 +375,23 @@ function App(this: any) {
             </Layout>
             {
                 !connected &&
-                <Alert message={`Please connect your wallet`} type="info"/>
+                <Alert message={`Please connect your wallet to devnet or testnet`} type="info"/>
             }
             {
-                connected && !isDevnet() &&
-                <Alert message={`Wallet is connected to ${network?.name}.  Please connect to devnet`} type="warning"/>
+                connected && (!isDevnet() && !isTestnet()) &&
+                <Alert message={`Wallet is connected to ${network?.name}.  Please connect to devnet or testnet`}
+                       type="warning"/>
             }
-            {connected && isDevnet() &&
+            {connected && (isDevnet() || isTestnet()) &&
                 <Layout>
+                    <EasyTitle msg="Faucet"/>
+                    <EasyButton msg="Get Funds" func={fundAccount}/>
+
+                    <EasyTitle msg="Basic inputs"/>
+                    <EasyButton msg="Test boolean" func={testBool}/>
+                    <EasyButton msg="Test address" func={testAddress}/>
+                    <EasyButton msg="Test string" func={testString}/>
+
                     <EasyTitle msg="Numbers"/>
                     <EasyButton msg="Test u8" func={testU8}/>
                     <EasyButton msg="Test u16" func={testU16}/>
@@ -275,13 +403,16 @@ function App(this: any) {
                     <EasyTitle msg="Objects"/>
                     <EasyButton msg="Test object (Object<T>)" func={testObject}/>
                     <EasyButton msg="Test vector object (vector<Object<T>>)" func={testVectorObject}/>
+
                     <EasyTitle msg="Options"/>
                     <EasyButton msg="Test option Some (Option<u64>(some))" func={testOptionSome}/>
                     <EasyButton msg="Test option None (Option<u64>(none))" func={testOptionNone}/>
+                    <EasyButton msg="Test option empty string (Option<string>(none))" func={testOptionStringSome}/>
+                    <EasyButton msg="Test option string none (Option<string>(none))" func={testOptionStringNone}/>
                     <EasyButton msg="Test vector option Some (Vector<Option<u64>>(some))"
-                                func={testOptionVectorSome}/>
+                                func={testVectorObjectSome}/>
                     <EasyButton msg="Test vector option None (Vector<Option<u64>>(none))"
-                                func={testOptionVectorNone}/>
+                                func={testVectorObjectNone}/>
                     <EasyTitle msg="Errors"/>
                     <EasyButton msg="Test error" func={testError}/>
                 </Layout>
