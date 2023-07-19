@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
@@ -19,12 +19,45 @@ import {
     AptosWalletAdapterProvider,
     NetworkName,
 } from "@aptos-labs/wallet-adapter-react";
+import {Select} from "antd";
 
 
-const wallets = [
+const DEVNET_WALLETS = [
+    new FewchaWallet(),
+    new MartianWallet(),
+    new MSafeWalletAdapter(),
+    new NightlyWallet(),
+    new OpenBlockWallet(),
+    new PetraWallet(),
+    new PontemWallet(),
+    new RiseWallet(),
+    new TokenPocketWallet(),
+    new TrustWallet(),
+    new WelldoneWallet(),
+];
+const TESTNET_WALLETS = [
     // Blocto supports Testnet/Mainnet for now.
     new BloctoWallet({
         network: NetworkName.Testnet,
+        bloctoAppId: "6d85f56e-5f2e-46cd-b5f2-5cf9695b4d46",
+    }),
+    new FewchaWallet(),
+    new MartianWallet(),
+    new MSafeWalletAdapter(),
+    new NightlyWallet(),
+    new OpenBlockWallet(),
+    new PetraWallet(),
+    new PontemWallet(),
+    new RiseWallet(),
+    new TokenPocketWallet(),
+    new TrustWallet(),
+    new WelldoneWallet(),
+];
+
+const MAINNET_WALLETS = [
+    // Blocto supports Testnet/Mainnet for now.
+    new BloctoWallet({
+        network: NetworkName.Mainnet,
         bloctoAppId: "6d85f56e-5f2e-46cd-b5f2-5cf9695b4d46",
     }),
     new FewchaWallet(),
@@ -44,11 +77,40 @@ const root = ReactDOM.createRoot(
 );
 root.render(
     <React.StrictMode>
-        <AptosWalletAdapterProvider plugins={wallets} autoConnect={true}>
-            <App/>
-        </AptosWalletAdapterProvider>
+        <Selector/>
     </React.StrictMode>
 );
+
+
+function Selector(this: any) {
+    const [network, setNetwork] = useState<string>("devnet");
+
+    return <>
+        <Select
+            defaultValue={"testnet"}
+            style={{width: 120}}
+            onChange={setNetwork}
+            options={[
+                {value: "devnet", label: "Devnet"},
+                {value: "testnet", label: "Testnet"},
+                {value: "mainnet", label: "Mainnet"},
+            ]}
+        />
+
+        {network === "devnet" &&
+            <AptosWalletAdapterProvider plugins={DEVNET_WALLETS} autoConnect={true}>
+                <App expectedNetwork={network}/>
+            </AptosWalletAdapterProvider>}
+        {network === "testnet" &&
+            <AptosWalletAdapterProvider plugins={TESTNET_WALLETS} autoConnect={true}>
+                <App expectedNetwork={network}/>
+            </AptosWalletAdapterProvider>}
+        {network === "mainnet" &&
+            <AptosWalletAdapterProvider plugins={MAINNET_WALLETS} autoConnect={true}>
+                <App expectedNetwork={network}/>
+            </AptosWalletAdapterProvider>}
+    </>
+}
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

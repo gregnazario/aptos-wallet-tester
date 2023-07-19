@@ -8,26 +8,39 @@ import {useState} from "react";
 // TODO: Load URL from wallet
 export const DEVNET_CLIENT = new Provider(Network.DEVNET);
 export const TESTNET_CLIENT = new Provider(Network.TESTNET);
+export const MAINNET_CLIENT = new Provider(Network.MAINNET);
 
 export const DEVNET_FAUCET = new FaucetClient("https://fullnode.devnet.aptoslabs.com", "https://faucet.devnet.aptoslabs.com");
 export const TESTNET_FAUCET = new FaucetClient("https://fullnode.testnet.aptoslabs.com", "https://faucet.testnet.aptoslabs.com");
 // TODO: make this more accessible / be deployed by others?
-export const MODULE_ADDRESS = "0x2b8ce856ae7536f41cddd1f7be1d9b69a46aa79a65e5b35f7f55732989751498";
+export const DEV_MODULE_ADDRESS = "0x2b8ce856ae7536f41cddd1f7be1d9b69a46aa79a65e5b35f7f55732989751498";
+export const MAINNET_MODULE_ADDRESS = "0x6de37368e31dff4580b211295198159ee6f98b42ffa93c5683bb955ca1be67e0";
 export const DEVNET_OBJECT_ADDRESS = "0xc261491e35296ffbb760715c2bb83b87ced70029e82e100ff53648b2f9e1a598";
 export const TESTNET_OBJECT_ADDRESS = "0x0777b949da6b895f058745a393ef9e90fc62137c625d03cb8c19fcac5fd372ff";
+export const MAINNET_OBJECT_ADDRESS = "0x64c3093330189cdf176c1fbde0fc4957534741a7949cc6d3c2ba6a2ad9088ab9";
 
 
-function App(this: any) {
+function App(props: {expectedNetwork: string}) {
     const {network, connected, signAndSubmitTransaction, account, wallet, isLoading} = useWallet();
 
+    const moduleAddress = (): string => {
+        if (isDevnet() || isTestnet()) {
+            return DEV_MODULE_ADDRESS;
+        } else {
+            return MAINNET_MODULE_ADDRESS;
+        }
+    }
+    const isExpectedNetwork = (): boolean => {
+        return network?.name?.toLowerCase() === props.expectedNetwork;
+    }
     const isDevnet = (): boolean => {
         // There's a very specific override here for Martian
-        return (network?.name as string).toLowerCase() === 'devnet' || (wallet?.name === "Martian" && network?.name.toLowerCase() === "custom");
+        return (network?.name as string)?.toLowerCase() === 'devnet' || (wallet?.name === "Martian" && network?.name.toLowerCase() === "custom");
     }
 
     const isTestnet = (): boolean => {
         // There's a very specific override here for Martian
-        return (network?.name as string).toLowerCase() === 'testnet';
+        return (network?.name as string)?.toLowerCase() === 'testnet';
     }
 
     const objectAddress = (): string => {
@@ -36,8 +49,7 @@ function App(this: any) {
         } else if (isTestnet()) {
             return TESTNET_OBJECT_ADDRESS
         } else {
-            console.log("Only devnet and testnet are supported")
-            return "Invalid"
+            return MAINNET_OBJECT_ADDRESS
         }
     }
 
@@ -67,7 +79,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_object`,
+                function: `${moduleAddress()}::wallet_tester::test_object`,
                 type_arguments: ["0x1::object::ObjectCore"],
                 arguments: [
                     object_address,
@@ -81,7 +93,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_vector_object`,
+                function: `${moduleAddress()}::wallet_tester::test_vector_object`,
                 type_arguments: ["0x1::object::ObjectCore"],
                 arguments: [
                     [object_address, object_address],
@@ -95,7 +107,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_object_fixed`,
+                function: `${moduleAddress()}::wallet_tester::test_object_fixed`,
                 type_arguments: [],
                 arguments: [
                     object_address,
@@ -109,7 +121,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_vector_object_fixed`,
+                function: `${moduleAddress()}::wallet_tester::test_vector_object_fixed`,
                 type_arguments: [],
                 arguments: [
                     [object_address, object_address],
@@ -122,7 +134,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_option`,
+                function: `${moduleAddress()}::wallet_tester::test_option`,
                 type_arguments: [],
                 arguments: [
                     "12345",
@@ -137,7 +149,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_option`,
+                function: `${moduleAddress()}::wallet_tester::test_option`,
                 type_arguments: [],
                 arguments: [
                     undefined,
@@ -151,7 +163,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_option_string`,
+                function: `${moduleAddress()}::wallet_tester::test_option_string`,
                 type_arguments: [],
                 arguments: [
                     "",
@@ -166,7 +178,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_option_none`,
+                function: `${moduleAddress()}::wallet_tester::test_option_none`,
                 type_arguments: [],
                 arguments: [
                     undefined,
@@ -180,7 +192,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_vector_option`,
+                function: `${moduleAddress()}::wallet_tester::test_vector_option`,
                 type_arguments: [],
                 arguments: [
                     ["12345", "54"],
@@ -193,7 +205,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_vector_option`,
+                function: `${moduleAddress()}::wallet_tester::test_vector_option`,
                 type_arguments: [],
                 arguments: [
                     undefined,
@@ -207,7 +219,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_error`,
+                function: `${moduleAddress()}::wallet_tester::test_error`,
                 type_arguments: [],
                 arguments: [],
             })
@@ -218,7 +230,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::init_object`,
+                function: `${moduleAddress()}::wallet_tester::init_object`,
                 type_arguments: [],
                 arguments: [],
             })
@@ -229,7 +241,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_bool`,
+                function: `${moduleAddress()}::wallet_tester::test_bool`,
                 type_arguments: [],
                 arguments: [
                     true
@@ -242,7 +254,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_address`,
+                function: `${moduleAddress()}::wallet_tester::test_address`,
                 type_arguments: [],
                 arguments: ["0x1"]
             })
@@ -253,7 +265,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_string`,
+                function: `${moduleAddress()}::wallet_tester::test_string`,
                 type_arguments: [],
                 arguments: ["hello world!"]
             })
@@ -263,7 +275,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_u8`,
+                function: `${moduleAddress()}::wallet_tester::test_u8`,
                 type_arguments: [],
                 arguments: [
                     255
@@ -276,7 +288,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_u16`,
+                function: `${moduleAddress()}::wallet_tester::test_u16`,
                 type_arguments: [],
                 arguments: [
                     65535
@@ -289,7 +301,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_u32`,
+                function: `${moduleAddress()}::wallet_tester::test_u32`,
                 type_arguments: [],
                 arguments: [
                     4294967295
@@ -303,7 +315,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_u64`,
+                function: `${moduleAddress()}::wallet_tester::test_u64`,
                 type_arguments: [],
                 arguments: [
                     "18446744073709551615"
@@ -316,7 +328,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_u128`,
+                function: `${moduleAddress()}::wallet_tester::test_u128`,
                 type_arguments: [],
                 arguments: [
                     "340282366920938463463374607431768211455"
@@ -329,7 +341,7 @@ function App(this: any) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${MODULE_ADDRESS}::wallet_tester::test_u256`,
+                function: `${moduleAddress()}::wallet_tester::test_u256`,
                 type_arguments: [],
                 arguments: [
                     "115792089237316195423570985008687907853269984665640564039457584007913129639935"
@@ -345,8 +357,7 @@ function App(this: any) {
         } else if (isTestnet()) {
             client = TESTNET_CLIENT;
         } else {
-            console.log("Only devnet and testnet are supported")
-            return undefined;
+            client = MAINNET_CLIENT;
         }
 
         try {
@@ -414,17 +425,18 @@ function App(this: any) {
             </Layout>
             {
                 !connected &&
-                <Alert message={`Please connect your wallet to devnet or testnet`} type="info"/>
+                <Alert message={`Please connect your wallet to ${props.expectedNetwork}`} type="info"/>
             }
             {
-                connected && (!isDevnet() && !isTestnet()) &&
-                <Alert message={`Wallet is connected to ${network?.name}.  Please connect to devnet or testnet`}
+                connected && (!isExpectedNetwork()) &&
+                <Alert message={`Wallet is connected to ${network?.name}.  Please connect to ${props.expectedNetwork}`}
                        type="warning"/>
             }
-            {connected && (isDevnet() || isTestnet()) &&
+            {connected && (isExpectedNetwork()) &&
                 <Layout>
-                    <EasyTitle msg="Faucet"/>
+                    { (isDevnet() || isTestnet()) && <><EasyTitle msg="Faucet"/>
                     <EasyButton msg="Get Funds" func={fundAccount}/>
+                    </>}
 
                     <EasyTitle msg="Basic inputs"/>
                     <EasyButton msg="Test boolean" func={testBool}/>
