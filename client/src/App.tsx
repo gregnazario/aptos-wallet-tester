@@ -13,7 +13,7 @@ export const DEVNET_FAUCET = new FaucetClient("https://fullnode.devnet.aptoslabs
 export const TESTNET_FAUCET = new FaucetClient("https://fullnode.testnet.aptoslabs.com", "https://faucet.testnet.aptoslabs.com");
 // TODO: make this more accessible / be deployed by others?
 export const MODULE_ADDRESS = "0x2b8ce856ae7536f41cddd1f7be1d9b69a46aa79a65e5b35f7f55732989751498";
-export const DEVNET_OBJECT_ADDRESS = "0x67e586973b2ccda1491aa274fc40c89cef5ae4e44aeb4746977b932867788ada";
+export const DEVNET_OBJECT_ADDRESS = "0xc261491e35296ffbb760715c2bb83b87ced70029e82e100ff53648b2f9e1a598";
 export const TESTNET_OBJECT_ADDRESS = "0x0777b949da6b895f058745a393ef9e90fc62137c625d03cb8c19fcac5fd372ff";
 
 
@@ -89,6 +89,34 @@ function App(this: any) {
             })
     }
 
+    const testObjectFixed = async (setState: TxnCallback) => {
+        const object_address = objectAddress();
+        await runTransaction(
+            setState,
+            {
+                type: "entry_function_payload",
+                function: `${MODULE_ADDRESS}::wallet_tester::test_object_fixed`,
+                type_arguments: [],
+                arguments: [
+                    object_address,
+                ],
+            })
+    }
+
+    const testVectorObjectFixed = async (setState: TxnCallback) => {
+        const object_address = objectAddress();
+        await runTransaction(
+            setState,
+            {
+                type: "entry_function_payload",
+                function: `${MODULE_ADDRESS}::wallet_tester::test_vector_object_fixed`,
+                type_arguments: [],
+                arguments: [
+                    [object_address, object_address],
+                ],
+            })
+    }
+
     const testOptionSome = async (setState: TxnCallback) => {
         await runTransaction(
             setState,
@@ -147,7 +175,7 @@ function App(this: any) {
             })
     }
 
-    const testVectorObjectSome = async (setState: TxnCallback) => {
+    const testVectorOptionSome = async (setState: TxnCallback) => {
         await runTransaction(
             setState,
             {
@@ -160,7 +188,7 @@ function App(this: any) {
                 ],
             })
     }
-    const testVectorObjectNone = async (setState: TxnCallback) => {
+    const testVectorOptionNone = async (setState: TxnCallback) => {
         await runTransaction(
             setState,
             {
@@ -180,6 +208,17 @@ function App(this: any) {
             {
                 type: "entry_function_payload",
                 function: `${MODULE_ADDRESS}::wallet_tester::test_error`,
+                type_arguments: [],
+                arguments: [],
+            })
+    }
+
+    const createObject = async (setState: TxnCallback) => {
+        await runTransaction(
+            setState,
+            {
+                type: "entry_function_payload",
+                function: `${MODULE_ADDRESS}::wallet_tester::init_object`,
                 type_arguments: [],
                 arguments: [],
             })
@@ -401,8 +440,11 @@ function App(this: any) {
                     <EasyButton msg="Test u256" func={testU256}/>
 
                     <EasyTitle msg="Objects"/>
+                    <EasyButton msg="Create object" func={createObject}/>
                     <EasyButton msg="Test object (Object<T>)" func={testObject}/>
                     <EasyButton msg="Test vector object (vector<Object<T>>)" func={testVectorObject}/>
+                    <EasyButton msg="Test object Fixed(Object<TestStruct>)" func={testObjectFixed}/>
+                    <EasyButton msg="Test vector object Fixed(vector<Object<TestStruct>>)" func={testVectorObjectFixed}/>
 
                     <EasyTitle msg="Options"/>
                     <EasyButton msg="Test option Some (Option<u64>(some))" func={testOptionSome}/>
@@ -410,9 +452,9 @@ function App(this: any) {
                     <EasyButton msg="Test option empty string (Option<string>(none))" func={testOptionStringSome}/>
                     <EasyButton msg="Test option string none (Option<string>(none))" func={testOptionStringNone}/>
                     <EasyButton msg="Test vector option Some (Vector<Option<u64>>(some))"
-                                func={testVectorObjectSome}/>
+                                func={testVectorOptionSome}/>
                     <EasyButton msg="Test vector option None (Vector<Option<u64>>(none))"
-                                func={testVectorObjectNone}/>
+                                func={testVectorOptionNone}/>
                     <EasyTitle msg="Errors"/>
                     <EasyButton msg="Test error" func={testError}/>
                 </Layout>

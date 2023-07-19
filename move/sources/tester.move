@@ -1,11 +1,12 @@
 module deploy_account::wallet_tester {
 
-    use aptos_framework::object::Object;
+    use aptos_framework::object::{Object, create_object_from_account, ObjectCore};
     use std::option::Option;
     use std::fixed_point32::FixedPoint32;
     use aptos_std::fixed_point64::FixedPoint64;
     use std::string::String;
     use std::option;
+    use aptos_framework::object;
 
     /// This is a test error
     const ETEST_ERROR: u64 = 12345;
@@ -14,12 +15,27 @@ module deploy_account::wallet_tester {
     /// Option was supposed to have a value but was empty
     const EOPTION_NOT_FILLED: u64 = 12345;
 
+    struct TestStruct has key, drop{
+    }
+
+    public entry fun init_object(account: &signer) {
+        let constructor = create_object_from_account(account);
+        let signer = object::generate_signer(&constructor);
+        move_to(&signer, TestStruct{});
+    }
 
     public entry fun test_object<T>(_input: Object<T>) {
         // DO nothing
     }
+    public entry fun test_object_fixed(_input: vector<Object<ObjectCore>>) {
+
+    }
 
     public entry fun test_vector_object<T>(_input: vector<Object<T>>) {
+        // DO nothing
+    }
+
+    public entry fun test_vector_object_fixed(_input: vector<Object<ObjectCore>>) {
         // DO nothing
     }
 
