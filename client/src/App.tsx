@@ -462,17 +462,14 @@ function App(props: { expectedNetwork: Network }) {
 
                     <EasyTitle msg="Options, these should not fail with an error either in the wallet or here"/>
                     <EasyButton msg="Test option Some (Option<u64>(some))" func={testOptionSome}/>
+                    <EasyButton msg="Test option None (Option<u64>(none))" func={testOptionNone}/>
                     <EasyButton msg="Test option empty string (Option<string>(some))" func={testOptionStringSome}/>
-
+                    <EasyButton msg="Test option string none (Option<string>(none))" func={testOptionStringNone}/>
                     <EasyButton msg="Test vector option Some (Vector<Option<u64>>(some))"
                                 func={testVectorOptionSome}/>
-
-                    <EasyTitle
-                        msg="These do not work with the SDK and some wallets and will be supported in a future release soon, ignore failures here"/>
-                    <EasyButton msg="Test option None (Option<u64>(none))" func={testOptionNone}/>
-                    <EasyButton msg="Test option string none (Option<string>(none))" func={testOptionStringNone}/>
                     <EasyButton msg="Test vector option None (Vector<Option<u64>>(none))"
                                 func={testVectorOptionNone}/>
+
                     <EasyTitle msg="Errors this should always fail, your wallet might want to prevent people from submitting it or at least show that it will fail"/>
                     <EasyButton msg="Test error" func={testError}/>
                 </Layout>
