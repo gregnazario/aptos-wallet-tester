@@ -178,7 +178,7 @@ function App(props: { expectedNetwork: Network }) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${moduleAddress()}::wallet_tester::test_option_none`,
+                function: `${moduleAddress()}::wallet_tester::test_option_string`,
                 type_arguments: [],
                 arguments: [
                     undefined,
@@ -382,7 +382,8 @@ function App(props: { expectedNetwork: Network }) {
             <Layout>
                 <Row align="middle">
                     <Col span={10} offset={2}>
-                        <h1>Wallet tester ({props.expectedNetwork})</h1>
+                        <h1>Wallet tester ({props.expectedNetwork}) <a
+                            href="https://github.com/gregnazario/aptos-wallet-tester">Source Code</a></h1>
                     </Col>
                     <Col span={12} style={{textAlign: "right", paddingRight: "200px"}}>
                         <WalletSelector/>
@@ -461,11 +462,15 @@ function App(props: { expectedNetwork: Network }) {
 
                     <EasyTitle msg="Options"/>
                     <EasyButton msg="Test option Some (Option<u64>(some))" func={testOptionSome}/>
-                    <EasyButton msg="Test option None (Option<u64>(none))" func={testOptionNone}/>
-                    <EasyButton msg="Test option empty string (Option<string>(none))" func={testOptionStringSome}/>
-                    <EasyButton msg="Test option string none (Option<string>(none))" func={testOptionStringNone}/>
+                    <EasyButton msg="Test option empty string (Option<string>(some))" func={testOptionStringSome}/>
+
                     <EasyButton msg="Test vector option Some (Vector<Option<u64>>(some))"
                                 func={testVectorOptionSome}/>
+
+                    <EasyTitle
+                        msg="These do not work with the SDK and will be supported in a future release soon, ignore failures here"/>
+                    <EasyButton msg="Test option None (Option<u64>(none))" func={testOptionNone}/>
+                    <EasyButton msg="Test option string none (Option<string>(none))" func={testOptionStringNone}/>
                     <EasyButton msg="Test vector option None (Vector<Option<u64>>(none))"
                                 func={testVectorOptionNone}/>
                     <EasyTitle msg="Errors"/>
