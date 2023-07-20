@@ -20,6 +20,8 @@ import {
     NetworkName,
 } from "@aptos-labs/wallet-adapter-react";
 import {Select} from "antd";
+import {createBrowserHistory} from "history";
+import {Network} from "aptos";
 
 
 const DEVNET_WALLETS = [
@@ -81,36 +83,52 @@ root.render(
     </React.StrictMode>
 );
 
+const getNetwork = (input: string | null) => {
+    if (input?.toLowerCase() === "devnet") {
+        return Network.DEVNET;
+    } else if (input?.toLowerCase() === "testnet") {
+        return Network.TESTNET;
+    } else if (input?.toLowerCase() === "mainnet") {
+        return Network.MAINNET;
+    } else {
+        return undefined;
+    }
+}
 
 function Selector(this: any) {
-    const [network, setNetwork] = useState<string>("testnet");
+    const [network, setNetwork] = useState<string>(getNetwork(new URLSearchParams(window.location.search).get("network")) ?? Network.TESTNET);
+    const browserHistory = createBrowserHistory();
 
     return <>
         <Select
-            defaultValue={"testnet"}
+            defaultValue={network}
             style={{width: 120}}
-            onChange={setNetwork}
+            onChange={(input) => {
+                setNetwork(input);
+                browserHistory.push(`?network=${input}`);
+            }}
             options={[
-                {value: "devnet", label: "Devnet"},
-                {value: "testnet", label: "Testnet"},
-                {value: "mainnet", label: "Mainnet"},
+                {value: Network.DEVNET, label: "Devnet"},
+                {value: Network.TESTNET, label: "Testnet"},
+                {value: Network.MAINNET, label: "Mainnet"},
             ]}
         />
 
-        {network === "devnet" &&
+        {network === Network.DEVNET &&
             <AptosWalletAdapterProvider plugins={DEVNET_WALLETS} autoConnect={true}>
                 <App expectedNetwork={network}/>
             </AptosWalletAdapterProvider>}
-        {network === "testnet" &&
+        {network === Network.TESTNET &&
             <AptosWalletAdapterProvider plugins={TESTNET_WALLETS} autoConnect={true}>
                 <App expectedNetwork={network}/>
             </AptosWalletAdapterProvider>}
-        {network === "mainnet" &&
+        {network === Network.MAINNET &&
             <AptosWalletAdapterProvider plugins={MAINNET_WALLETS} autoConnect={true}>
                 <App expectedNetwork={network}/>
             </AptosWalletAdapterProvider>}
     </>
 }
+
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

@@ -20,7 +20,7 @@ export const TESTNET_OBJECT_ADDRESS = "0x0777b949da6b895f058745a393ef9e90fc62137
 export const MAINNET_OBJECT_ADDRESS = "0x64c3093330189cdf176c1fbde0fc4957534741a7949cc6d3c2ba6a2ad9088ab9";
 
 
-function App(props: {expectedNetwork: string}) {
+function App(props: { expectedNetwork: Network }) {
     const {network, connected, signAndSubmitTransaction, account, wallet, isLoading} = useWallet();
 
     const moduleAddress = (): string => {
@@ -382,7 +382,7 @@ function App(props: {expectedNetwork: string}) {
             <Layout>
                 <Row align="middle">
                     <Col span={10} offset={2}>
-                        <h1>Wallet tester ({network?.name})</h1>
+                        <h1>Wallet tester ({props.expectedNetwork})</h1>
                     </Col>
                     <Col span={12} style={{textAlign: "right", paddingRight: "200px"}}>
                         <WalletSelector/>
@@ -434,8 +434,8 @@ function App(props: {expectedNetwork: string}) {
             }
             {connected && (isExpectedNetwork()) &&
                 <Layout>
-                    { (isDevnet() || isTestnet()) && <><EasyTitle msg="Faucet"/>
-                    <EasyButton msg="Get Funds" func={fundAccount}/>
+                    {(isDevnet() || isTestnet()) && <><EasyTitle msg="Faucet"/>
+                        <EasyButton msg="Get Funds" func={fundAccount}/>
                     </>}
 
                     <EasyTitle msg="Basic inputs"/>
@@ -456,7 +456,8 @@ function App(props: {expectedNetwork: string}) {
                     <EasyButton msg="Test object (Object<T>)" func={testObject}/>
                     <EasyButton msg="Test vector object (vector<Object<T>>)" func={testVectorObject}/>
                     <EasyButton msg="Test object Fixed(Object<TestStruct>)" func={testObjectFixed}/>
-                    <EasyButton msg="Test vector object Fixed(vector<Object<TestStruct>>)" func={testVectorObjectFixed}/>
+                    <EasyButton msg="Test vector object Fixed(vector<Object<TestStruct>>)"
+                                func={testVectorObjectFixed}/>
 
                     <EasyTitle msg="Options"/>
                     <EasyButton msg="Test option Some (Option<u64>(some))" func={testOptionSome}/>
