@@ -83,7 +83,7 @@ root.render(
 
 
 function Selector(this: any) {
-    const [network, setNetwork] = useState<string>("devnet");
+    const [network, setNetwork] = useState<string>("testnet");
 
     return <>
         <Select
