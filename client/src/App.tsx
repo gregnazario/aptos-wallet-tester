@@ -439,12 +439,12 @@ function App(props: { expectedNetwork: Network }) {
                         <EasyButton msg="Get Funds" func={fundAccount}/>
                     </>}
 
-                    <EasyTitle msg="Basic inputs"/>
+                    <EasyTitle msg="Basic inputs, these should not fail with an error either in the wallet or here"/>
                     <EasyButton msg="Test boolean" func={testBool}/>
                     <EasyButton msg="Test address" func={testAddress}/>
                     <EasyButton msg="Test string" func={testString}/>
 
-                    <EasyTitle msg="Numbers"/>
+                    <EasyTitle msg="Numbers, these should not fail with an error either in the wallet or here"/>
                     <EasyButton msg="Test u8" func={testU8}/>
                     <EasyButton msg="Test u16" func={testU16}/>
                     <EasyButton msg="Test u32" func={testU32}/>
@@ -452,15 +452,15 @@ function App(props: { expectedNetwork: Network }) {
                     <EasyButton msg="Test u128" func={testU128}/>
                     <EasyButton msg="Test u256" func={testU256}/>
 
-                    <EasyTitle msg="Objects"/>
-                    <EasyButton msg="Create object" func={createObject}/>
+                    <EasyTitle msg="Objects, these should not fail with an error either in the wallet or here"/>
+                    {(isDevnet() || isTestnet()) && <EasyButton msg="Create object" func={createObject}/>}
                     <EasyButton msg="Test object (Object<T>)" func={testObject}/>
                     <EasyButton msg="Test vector object (vector<Object<T>>)" func={testVectorObject}/>
                     <EasyButton msg="Test object Fixed(Object<TestStruct>)" func={testObjectFixed}/>
                     <EasyButton msg="Test vector object Fixed(vector<Object<TestStruct>>)"
                                 func={testVectorObjectFixed}/>
 
-                    <EasyTitle msg="Options"/>
+                    <EasyTitle msg="Options, these should not fail with an error either in the wallet or here"/>
                     <EasyButton msg="Test option Some (Option<u64>(some))" func={testOptionSome}/>
                     <EasyButton msg="Test option empty string (Option<string>(some))" func={testOptionStringSome}/>
 
@@ -468,12 +468,12 @@ function App(props: { expectedNetwork: Network }) {
                                 func={testVectorOptionSome}/>
 
                     <EasyTitle
-                        msg="These do not work with the SDK and will be supported in a future release soon, ignore failures here"/>
+                        msg="These do not work with the SDK and some wallets and will be supported in a future release soon, ignore failures here"/>
                     <EasyButton msg="Test option None (Option<u64>(none))" func={testOptionNone}/>
                     <EasyButton msg="Test option string none (Option<string>(none))" func={testOptionStringNone}/>
                     <EasyButton msg="Test vector option None (Vector<Option<u64>>(none))"
                                 func={testVectorOptionNone}/>
-                    <EasyTitle msg="Errors"/>
+                    <EasyTitle msg="Errors this should always fail, your wallet might want to prevent people from submitting it or at least show that it will fail"/>
                     <EasyButton msg="Test error" func={testError}/>
                 </Layout>
             }
