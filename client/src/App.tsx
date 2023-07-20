@@ -107,7 +107,7 @@ function App(props: { expectedNetwork: Network }) {
             setState,
             {
                 type: "entry_function_payload",
-                function: `${moduleAddress()}::wallet_tester::test_object_fixed`,
+                function: `${moduleAddress()}::wallet_tester::test_object_fixed_correct`,
                 type_arguments: [],
                 arguments: [
                     object_address,

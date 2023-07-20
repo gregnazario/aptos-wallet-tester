@@ -31,6 +31,10 @@ module deploy_account::wallet_tester {
 
     }
 
+    public entry fun test_object_fixed_correct(_input: Object<ObjectCore>) {
+
+    }
+
     public entry fun test_vector_object<T>(_input: vector<Object<T>>) {
         // DO nothing
     }
