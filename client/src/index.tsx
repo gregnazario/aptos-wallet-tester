@@ -15,6 +15,7 @@ import {TokenPocketWallet} from "@tp-lab/aptos-wallet-adapter";
 import {TrustWallet} from "@trustwallet/aptos-wallet-adapter";
 import {MSafeWalletAdapter} from "msafe-plugin-wallet-adapter";
 import {WelldoneWallet} from "@welldone-studio/aptos-wallet-adapter";
+import {IdentityConnectWallet} from "@identity-connect/wallet-adapter-plugin"
 import {
     AptosWalletAdapterProvider,
     NetworkName,
@@ -22,9 +23,14 @@ import {
 import {Select} from "antd";
 import {createBrowserHistory} from "history";
 import {Network} from "aptos";
+import {Buffer as BufferPolyFill} from 'buffer';
 
+const icDappId = 'abcd6ba8-b4e1-4ddf-9c59-3b406b5b5e2a';
+
+window.Buffer = BufferPolyFill;
 
 const DEVNET_WALLETS = [
+    new IdentityConnectWallet(icDappId, NetworkName.Devnet),
     new FewchaWallet(),
     new MartianWallet(),
     new MSafeWalletAdapter(),
@@ -38,6 +44,7 @@ const DEVNET_WALLETS = [
     new WelldoneWallet(),
 ];
 const TESTNET_WALLETS = [
+    new IdentityConnectWallet(icDappId, NetworkName.Testnet),
     // Blocto supports Testnet/Mainnet for now.
     new BloctoWallet({
         network: NetworkName.Testnet,
@@ -57,6 +64,7 @@ const TESTNET_WALLETS = [
 ];
 
 const MAINNET_WALLETS = [
+    new IdentityConnectWallet(icDappId, NetworkName.Mainnet),
     // Blocto supports Testnet/Mainnet for now.
     new BloctoWallet({
         network: NetworkName.Mainnet,
