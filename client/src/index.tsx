@@ -30,7 +30,7 @@ const icDappId = '12346ba8-b4e1-4ddf-9c59-3b406b5b5e2a';
 window.Buffer = BufferPolyFill;
 
 const DEVNET_WALLETS = [
-    new IdentityConnectWallet(icDappId, NetworkName.Devnet),
+    new IdentityConnectWallet(icDappId, {networkName: NetworkName.Devnet}),
     new FewchaWallet(),
     new MartianWallet(),
     new MSafeWalletAdapter(),
@@ -44,7 +44,7 @@ const DEVNET_WALLETS = [
     new WelldoneWallet(),
 ];
 const TESTNET_WALLETS = [
-    new IdentityConnectWallet(icDappId, NetworkName.Testnet),
+    new IdentityConnectWallet(icDappId, {networkName: NetworkName.Testnet}),
     // Blocto supports Testnet/Mainnet for now.
     new BloctoWallet({
         network: NetworkName.Testnet,
@@ -64,7 +64,7 @@ const TESTNET_WALLETS = [
 ];
 
 const MAINNET_WALLETS = [
-    new IdentityConnectWallet(icDappId, NetworkName.Mainnet),
+    new IdentityConnectWallet(icDappId, {networkName: NetworkName.Mainnet}),
     // Blocto supports Testnet/Mainnet for now.
     new BloctoWallet({
         network: NetworkName.Mainnet,
