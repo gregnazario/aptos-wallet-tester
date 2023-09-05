@@ -25,7 +25,7 @@ import {createBrowserHistory} from "history";
 import {Network} from "aptos";
 import {Buffer as BufferPolyFill} from 'buffer';
 
-const icDappId = '12346ba8-b4e1-4ddf-9c59-3b406b5b5e2a';
+const icDappId = '72e3139f-17b6-4146-9936-0d8010e6cef2';
 
 window.Buffer = BufferPolyFill;
 

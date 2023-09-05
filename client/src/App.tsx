@@ -13,7 +13,7 @@ export const MAINNET_CLIENT = new Provider(Network.MAINNET);
 export const DEVNET_FAUCET = new FaucetClient("https://fullnode.devnet.aptoslabs.com", "https://faucet.devnet.aptoslabs.com");
 export const TESTNET_FAUCET = new FaucetClient("https://fullnode.testnet.aptoslabs.com", "https://faucet.testnet.aptoslabs.com");
 // TODO: make this more accessible / be deployed by others?
-export const DEV_MODULE_ADDRESS = "0x2b8ce856ae7536f41cddd1f7be1d9b69a46aa79a65e5b35f7f55732989751498";
+export const DEV_MODULE_ADDRESS = "0xb11affd5c514bb969e988710ef57813d9556cc1e3fe6dc9aa6a82b56aee53d98";
 export const MAINNET_MODULE_ADDRESS = "0x6de37368e31dff4580b211295198159ee6f98b42ffa93c5683bb955ca1be67e0";
 export const DEVNET_OBJECT_ADDRESS = "0xc261491e35296ffbb760715c2bb83b87ced70029e82e100ff53648b2f9e1a598";
 export const TESTNET_OBJECT_ADDRESS = "0x3eafcd35de233463ea4d8653638c323211865163853f2f866705670b291d3370";
@@ -349,16 +349,101 @@ function App(props: { expectedNetwork: Network }) {
             })
     }
 
+    const viewBool = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_bool", [true])
+    }
+    const viewAddress = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_address", ["0x1234"])
+    }
+    const viewString = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_string", ["I am a teapot!"])
+    }
+    const viewVecu8 = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_vecu8", ["0xDEADBEEF"])
+    }
+    const viewVecu64 = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_vecu64", [["1234", "5678"]])
+    }
+    const viewU8 = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_u8", [255])
+    }
+    const viewU16 = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_u16", [65535])
+    }
+    const viewU32 = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_u32", [4294967295])
+    }
+    const viewU64 = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_u64", ["18446744073709551615"])
+    }
+    const viewU128 = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_u128", ["340282366920938463463374607431768211455"])
+    }
+    const viewU256 = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_u256", ["115792089237316195423570985008687907853269984665640564039457584007913129639935"])
+    }
+
+
+    const viewF32 = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_f32", [])
+    }
+    const viewF64 = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_f64", [])
+    }
+    const viewTuple = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_tuple", [])
+    }
+    const viewStruct = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_struct", [])
+    }
+    const viewNestedStruct = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_nested_struct", ["0x55d961f494468f71d57d84cc9f4f7eb8dc784c4eafd83de6dc98c8526646b7cd"])
+    }
+
+    const viewFixedObject = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_object_fixed", ["0x55d961f494468f71d57d84cc9f4f7eb8dc784c4eafd83de6dc98c8526646b7cd"])
+    }
+    const viewVariableObject = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_object_variable", ["0x55d961f494468f71d57d84cc9f4f7eb8dc784c4eafd83de6dc98c8526646b7cd"], ["0x1::object::ObjectCore"])
+    }
+    const viewOptionNone = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_option", [[]])
+    }
+    const viewOptionSome = async (setState: TxnCallback) => {
+        await testViewFunction(setState, "view_option", [["I'm here!"]])
+    }
+
+    const testViewFunction = async (setState: TxnCallback, name: string, args: any[], type_args?: any[]) => {
+        let client = getProvider();
+        try {
+            let msg = JSON.stringify(await client.view({
+                arguments: args,
+                function: `${moduleAddress()}::wallet_tester::${name}`,
+                type_arguments: type_args ?? [],
+            }));
+            setState({
+                state: "success", msg: msg
+            });
+            return msg;
+        } catch (error: any) {
+            console.log("View function failed" + JSON.stringify(error))
+            setState({state: "error", msg: `Failed txn due to ${JSON.stringify(error)}`})
+        }
+    }
+
+    const getProvider = (): Provider => {
+        if (isDevnet()) {
+            return DEVNET_CLIENT;
+        } else if (isTestnet()) {
+            return TESTNET_CLIENT;
+        } else {
+            return MAINNET_CLIENT;
+        }
+    }
+
     const runTransaction = async <T extends Types.TransactionPayload>(setState: TxnCallback, payload: T) => {
         console.log(`Running payload: ${JSON.stringify(payload)}`);
-        let client: Provider;
-        if (isDevnet()) {
-            client = DEVNET_CLIENT;
-        } else if (isTestnet()) {
-            client = TESTNET_CLIENT;
-        } else {
-            client = MAINNET_CLIENT;
-        }
+        let client = getProvider();
 
         try {
             const response = await signAndSubmitTransaction(payload);
@@ -470,7 +555,32 @@ function App(props: { expectedNetwork: Network }) {
                     <EasyButton msg="Test vector option None (Vector<Option<u64>>(none))"
                                 func={testVectorOptionNone}/>
 
-                    <EasyTitle msg="Errors this should always fail, your wallet might want to prevent people from submitting it or at least show that it will fail"/>
+                    <EasyTitle
+                        msg="View functions"/>
+                    <EasyButton msg="View Bool" func={viewBool}/>
+                    <EasyButton msg="View Address" func={viewAddress}/>
+                    <EasyButton msg="View String" func={viewString}/>
+                    <EasyButton msg="View Vecu8" func={viewVecu8}/>
+                    <EasyButton msg="View Vecu64" func={viewVecu64}/>
+                    <EasyButton msg="View u8" func={viewU8}/>
+                    <EasyButton msg="View u16" func={viewU16}/>
+                    <EasyButton msg="View u32" func={viewU32}/>
+                    <EasyButton msg="View u64" func={viewU64}/>
+                    <EasyButton msg="View u128" func={viewU128}/>
+                    <EasyButton msg="View u256" func={viewU256}/>
+                    <EasyButton msg="View F32" func={viewF32}/>
+                    <EasyButton msg="View F64" func={viewF64}/>
+                    <EasyButton msg="View tuple" func={viewTuple}/>
+                    <EasyButton msg="View struct" func={viewStruct}/>
+                    <EasyButton msg="View nested struct" func={viewNestedStruct}/>
+                    <EasyButton msg="View fixed typed object" func={viewFixedObject}/>
+                    <EasyButton msg="View typed object" func={viewVariableObject}/>
+                    <EasyButton msg="View some option" func={viewOptionSome}/>
+                    <EasyButton msg="View none option" func={viewOptionNone}/>
+
+
+                    <EasyTitle
+                        msg="Errors this should always fail, your wallet might want to prevent people from submitting it or at least show that it will fail"/>
                     <EasyButton msg="Test error" func={testError}/>
                 </Layout>
             }
