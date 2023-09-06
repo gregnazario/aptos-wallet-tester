@@ -35,8 +35,14 @@ Change into the move folder
 cd move
 ```
 
-Publish the contract
+Publish the contract to devnet or testnet
 ```
+export NETWORK="devnet"
 export PROFILE="profile-name"
+
+aptos init --profile $PROFILE --network $NETWORK
+
 aptos move publish --named-addresses deploy_account=$PROFILE --profile $PROFILE
 ```
+
+Then you will need to update the constants in the `client` folder for the address to match
