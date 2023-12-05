@@ -24,6 +24,7 @@ import { createBrowserHistory } from "history";
 import { Network } from "aptos";
 import { Buffer as BufferPolyFill } from "buffer";
 import { OKXWallet } from "@okwallet/aptos-wallet-adapter";
+import {MSafeWalletAdapter} from "@msafe/aptos-wallet-adapter";
 
 const icDappId = "12346ba8-b4e1-4ddf-9c59-3b406b5b5e2a";
 
@@ -33,6 +34,7 @@ const DEVNET_WALLETS = [
   new IdentityConnectWallet(icDappId, { networkName: NetworkName.Devnet }),
   new FewchaWallet(),
   new MartianWallet(),
+  new MSafeWalletAdapter(),
   new NightlyWallet(),
   new OKXWallet(),
   new OpenBlockWallet(),
@@ -52,6 +54,7 @@ const TESTNET_WALLETS = [
   }),
   new FewchaWallet(),
   new MartianWallet(),
+  new MSafeWalletAdapter(),
   new NightlyWallet(),
   new OKXWallet(),
   new OpenBlockWallet(),
@@ -72,6 +75,7 @@ const MAINNET_WALLETS = [
   }),
   new FewchaWallet(),
   new MartianWallet(),
+  new MSafeWalletAdapter(),
   new NightlyWallet(),
   new OKXWallet(),
   new OpenBlockWallet(),
