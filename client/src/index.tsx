@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
-import reportWebVitals from "./reportWebVitals";
 import { BloctoWallet } from "@blocto/aptos-wallet-adapter-plugin";
 import { FewchaWallet } from "fewcha-plugin-wallet-adapter";
 import { MartianWallet } from "@martianwallet/aptos-wallet-adapter";
@@ -24,7 +23,7 @@ import { createBrowserHistory } from "history";
 import { Network } from "aptos";
 import { Buffer as BufferPolyFill } from "buffer";
 import { OKXWallet } from "@okwallet/aptos-wallet-adapter";
-import {MSafeWalletAdapter} from "@msafe/aptos-wallet-adapter";
+import { MSafeWalletAdapter } from "@msafe/aptos-wallet-adapter";
 
 const icDappId = "12346ba8-b4e1-4ddf-9c59-3b406b5b5e2a";
 
@@ -154,8 +153,3 @@ function Selector(this: any) {
     </>
   );
 }
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
