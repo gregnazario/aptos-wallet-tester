@@ -1,29 +1,29 @@
 import { Alert, Button, Col, Layout, Row } from "antd";
 import { WalletSelector } from "@aptos-labs/wallet-adapter-ant-design";
 import "@aptos-labs/wallet-adapter-ant-design/dist/index.css";
-import { FaucetClient, Network, Provider } from "aptos";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { useState } from "react";
 import {
+  Aptos,
+  AptosConfig,
   EntryFunctionArgumentTypes,
+  Network,
   SimpleEntryFunctionArgumentTypes,
   TypeTag,
 } from "@aptos-labs/ts-sdk";
 import { InputGenerateTransactionData } from "@aptos-labs/wallet-adapter-core";
 
 // TODO: Load URL from wallet
-export const DEVNET_CLIENT = new Provider(Network.DEVNET);
-export const TESTNET_CLIENT = new Provider(Network.TESTNET);
-export const MAINNET_CLIENT = new Provider(Network.MAINNET);
+export const DEVNET_CLIENT = new Aptos(
+  new AptosConfig({ network: Network.DEVNET }),
+);
+export const TESTNET_CLIENT = new Aptos(
+  new AptosConfig({ network: Network.TESTNET }),
+);
+export const MAINNET_CLIENT = new Aptos(
+  new AptosConfig({ network: Network.MAINNET }),
+);
 
-export const DEVNET_FAUCET = new FaucetClient(
-  "https://fullnode.devnet.aptoslabs.com",
-  "https://faucet.devnet.aptoslabs.com",
-);
-export const TESTNET_FAUCET = new FaucetClient(
-  "https://fullnode.testnet.aptoslabs.com",
-  "https://faucet.testnet.aptoslabs.com",
-);
 // TODO: make this more accessible / be deployed by others?
 export const DEV_MODULE_ADDRESS =
   "0x2b8ce856ae7536f41cddd1f7be1d9b69a46aa79a65e5b35f7f55732989751498";
@@ -86,10 +86,16 @@ function App(props: { expectedNetwork: Network }) {
     }
     try {
       if (isDevnet()) {
-        await DEVNET_FAUCET.fundAccount(account?.address, 100000000);
+        await DEVNET_CLIENT.fundAccount({
+          accountAddress: account.address,
+          amount: 100000000,
+        });
         setState({ state: "success", msg: `Wallet funded` });
       } else if (isTestnet()) {
-        await TESTNET_FAUCET.fundAccount(account?.address, 100000000);
+        await TESTNET_CLIENT.fundAccount({
+          accountAddress: account.address,
+          amount: 100000000,
+        });
         setState({ state: "success", msg: `Wallet funded` });
       } else {
         console.log("Only devnet and testnet are supported");
@@ -281,7 +287,7 @@ function App(props: { expectedNetwork: Network }) {
     payload: InputGenerateTransactionData,
   ) => {
     console.log(`Running payload: ${JSON.stringify(payload)}`);
-    let client: Provider;
+    let client: Aptos;
     if (isDevnet()) {
       client = DEVNET_CLIENT;
     } else if (isTestnet()) {
@@ -294,11 +300,13 @@ function App(props: { expectedNetwork: Network }) {
       const response = await signAndSubmitTransaction(payload);
       console.log(`Successfully submitted`);
       console.log(`Retrieved response: ${JSON.stringify(response)}`);
-      await client.waitForTransaction(response.hash);
+      await client.waitForTransaction({ transactionHash: response.hash });
       console.log(
         `Successfully committed https://explorer.aptoslabs.com/txn/${response.hash}`,
       );
-      let txn = (await client.getTransactionByHash(response.hash)) as any;
+      let txn = (await client.getTransactionByHash({
+        transactionHash: response.hash,
+      })) as any;
       console.log(`Txn: ${JSON.stringify(txn)}`);
       setState({ state: "success", msg: `Successful txn ${txn.hash}` });
       return txn;
