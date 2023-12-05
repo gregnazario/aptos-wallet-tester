@@ -24,8 +24,14 @@ import { Network } from "aptos";
 import { Buffer as BufferPolyFill } from "buffer";
 import { OKXWallet } from "@okwallet/aptos-wallet-adapter";
 import { MSafeWalletAdapter } from "@msafe/aptos-wallet-adapter";
+import { SpikaWallet } from "@spika/aptos-plugin";
+import { ShadowWallet } from "@flipperplatform/wallet-adapter-plugin";
+import { FaceWallet } from "@haechi-labs/face-aptos-adapter-plugin";
+import { Face, Network as FaceNetwork } from "@haechi-labs/face-sdk";
 
 const icDappId = "12346ba8-b4e1-4ddf-9c59-3b406b5b5e2a";
+const FACE_WALLET_TEST_API_KEY =
+  "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCS23ncDS7x8nmTuK1FFN0EfYo0vo6xhTBMBNWVbQsufv60X8hv3-TbAQ3JIyMEhLo-c-31oYrvrQ0G2e9j8yvJYEUnLuE-PaABo0y3V5m9g_qdTB5p9eEfqZlDrcUl1zUr4W7rJwFwkTlAFSKOqVCPnm8ozmcMyyrEHgl2AbehrQIDAQAB";
 
 window.Buffer = BufferPolyFill;
 
@@ -43,6 +49,8 @@ const DEVNET_WALLETS = [
   new TokenPocketWallet(),
   new TrustWallet(),
   new WelldoneWallet(),
+  new SpikaWallet(),
+  new ShadowWallet(),
 ];
 const TESTNET_WALLETS = [
   new IdentityConnectWallet(icDappId, { networkName: NetworkName.Testnet }),
@@ -51,6 +59,12 @@ const TESTNET_WALLETS = [
     network: NetworkName.Testnet,
     bloctoAppId: "6d85f56e-5f2e-46cd-b5f2-5cf9695b4d46",
   }),
+  new FaceWallet(
+    new Face({
+      apiKey: FACE_WALLET_TEST_API_KEY,
+      network: FaceNetwork.APTOS_TESTNET,
+    }),
+  ),
   new FewchaWallet(),
   new MartianWallet(),
   new MSafeWalletAdapter(),
@@ -63,6 +77,8 @@ const TESTNET_WALLETS = [
   new TokenPocketWallet(),
   new TrustWallet(),
   new WelldoneWallet(),
+  new SpikaWallet(),
+  new ShadowWallet(),
 ];
 
 const MAINNET_WALLETS = [
@@ -84,6 +100,8 @@ const MAINNET_WALLETS = [
   new TokenPocketWallet(),
   new TrustWallet(),
   new WelldoneWallet(),
+  new SpikaWallet(),
+  new ShadowWallet(),
 ];
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement,

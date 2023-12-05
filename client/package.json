@@ -6,7 +6,6 @@
     "@aptos-labs/wallet-adapter-ant-design": "^2.0.0",
     "@aptos-labs/wallet-adapter-core": "^3.0.0",
     "@aptos-labs/wallet-adapter-react": "^2.0.0",
-    "@coin98-com/aptos-wallet-adapter-plugin": "^1.0.0",
     "@blocto/aptos-wallet-adapter-plugin": "^0.2.5",
     "@flipperplatform/wallet-adapter-plugin": "^0.2.0",
     "@haechi-labs/face-aptos-adapter-plugin": "^0.0.4",
