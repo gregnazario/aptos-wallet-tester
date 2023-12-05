@@ -33,7 +33,8 @@
     "react-dom": "^18.2.0",
     "react-router": "^6.20.1",
     "web-vitals": "^2.1.4",
-    "buffer": "^6.0.3"
+    "buffer": "^6.0.3",
+    "ethers": "^5.7.2"
   },
   "devDependencies": {
     "antd": "^5.12.1",
