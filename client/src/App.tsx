@@ -1,7 +1,10 @@
 import { Alert, Button, Col, Layout, Row } from "antd";
 import { WalletSelector } from "@aptos-labs/wallet-adapter-ant-design";
 import "@aptos-labs/wallet-adapter-ant-design/dist/index.css";
-import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import {
+  InputTransactionData,
+  useWallet,
+} from "@aptos-labs/wallet-adapter-react";
 import { useState } from "react";
 import {
   Aptos,
@@ -11,7 +14,6 @@ import {
   SimpleEntryFunctionArgumentTypes,
   TypeTag,
 } from "@aptos-labs/ts-sdk";
-import { InputGenerateTransactionData } from "@aptos-labs/wallet-adapter-core";
 
 // TODO: Load URL from wallet
 export const DEVNET_CLIENT = new Aptos(
@@ -120,7 +122,6 @@ function App(props: { expectedNetwork: Network }) {
     typeArgs?: (string | TypeTag)[],
   ) => {
     await runTransaction(setState, {
-      sender: account!.address,
       data: {
         function: `${moduleAddress()}::${moduleName}::${functionName}`,
         typeArguments: typeArgs ?? [],
@@ -284,7 +285,7 @@ function App(props: { expectedNetwork: Network }) {
 
   const runTransaction = async (
     setState: TxnCallback,
-    payload: InputGenerateTransactionData,
+    payload: InputTransactionData,
   ) => {
     console.log(`Running payload: ${JSON.stringify(payload)}`);
     let client: Aptos;
