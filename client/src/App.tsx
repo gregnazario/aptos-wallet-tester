@@ -83,7 +83,7 @@ function App(props: { expectedNetwork: Network }) {
     event: any,
     setter: (value: ((prevState: boolean) => boolean) | boolean) => void,
   ) => {
-    const val = event.target.value === true;
+    const val = event.target.checked;
     setter(val);
   };
 
@@ -237,7 +237,7 @@ function App(props: { expectedNetwork: Network }) {
         <Layout>
           <EasyTitle msg={`Run ${FUNCTION}`} />
           <Row>
-            <Col>Note that there is no trimming on inputs</Col>
+            <Col>Note that there is trimming on inputs</Col>
           </Row>
           <Row>
             <Col>Collection Name (string)</Col>
