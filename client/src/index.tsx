@@ -42,7 +42,7 @@ const getNetwork = (input: string | null) => {
 function Selector(this: any) {
   const [network, setNetwork] = useState<string>(
     getNetwork(new URLSearchParams(window.location.search).get("network")) ??
-      Network.MAINNET,
+      Network.DEVNET,
   );
   const browserHistory = createBrowserHistory();
 
@@ -55,10 +55,10 @@ function Selector(this: any) {
           setNetwork(input);
           browserHistory.push(`?network=${input}`);
         }}
-        options={[{ value: Network.MAINNET, label: "Mainnet" }]}
+        options={[{ value: Network.DEVNET, label: "Devnet" }]}
       />
 
-      {network === Network.MAINNET && (
+      {network === Network.DEVNET && (
         <AptosWalletAdapterProvider
           plugins={MAINNET_WALLETS}
           autoConnect={true}
